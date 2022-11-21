@@ -3,10 +3,12 @@ function languageFeatures() {
      const eyeColor = 'red';
 
     //use let instead of var
-    // var myKey;
+    // var myKey to handle block, function and global scopes;
     let herKey;
     
     //rest parameters
+    //use this if dealing with unknown number of parameters
+    //for a given user
     function myShoes(...allMyShoes) {
         allMyShoes.forEach(shoe => {
             console.log(shoe);
@@ -109,6 +111,7 @@ function languageFeatures() {
     console.log('FUNCTION SCOPE 1.........');
     function startCar(carId) {
         let message = 'Starting....';
+        console.log(message);
     }
     
     startCar(123);
@@ -277,6 +280,7 @@ function languageFeatures() {
     }
 
     let vehicle1 = new Car1();
+    console.log(typeof(vehicle1));
 
     function Car2(id) {
         this.carId = id;
@@ -360,6 +364,7 @@ function languageFeatures() {
         console.log(car, index);
     });
 
+    console.log('\n');
     console.log('Filtering and Array');
     let carIds4 = [
         {carId: 123, style: 'sedan'},
@@ -373,6 +378,7 @@ function languageFeatures() {
 
     console.log(convertibles);
 
+    console.log('\n');
     console.log('Testing an Array');
     let carIds5 = [
         {carId: 123, style: 'sedan'},
@@ -386,6 +392,7 @@ function languageFeatures() {
 
     console.log(result);
 
+    console.log('\n');
     console.log('Locating the first match in an Array');
     let carIds6 = [
         {carId: 123, style: 'sedan'},
@@ -419,7 +426,8 @@ function languageFeatures() {
     console.log(car5.id);
     console.log(car5.identify());
 
-    console.log('class inheritance.....................');
+    console.log('\n');
+    console.log('CLASS INHERITANCE.....................');
 
     class Vehicle {
         constructor() {
@@ -481,8 +489,8 @@ function languageFeatures() {
     console.log('SELECT DOM ELEMENTS...............');
 
     let el = document.getElementById('first-paragraph');
-    let els = document.getElementsByClassName('paragraph-two');
-    let els2 = document.getElementsByTagName('p');
+    let els = document.getElementsByClassName('p3');
+    let els2 = document.getElementsByTagName('h1');
 
     console.log(el);
     console.log(els);
@@ -492,18 +500,19 @@ function languageFeatures() {
     console.log('\n');
     console.log('MODIFY DOM ELEMENTS...............');
 
-    let el1 = document.getElementById('first-paragraph');
+    let el1 = document.getElementById('second-paragraph');
 
-    el.textContent = 'This is the new content';
-    el.setAttribute('name', 'para-one');
-    el.classList.add('new-class-name');
-    el.style.color = 'red';
+    console.log(el1);
+    el1.textContent = 'This is the new content';
+    el1.setAttribute('name', 'para-one');
+    el1.classList.add('new-class-name');
+    el1.style.color = 'red';
     
-    //Promises and Error Handling   
+    //Error Handling   
     console.log('\n');
-    console.log('PROMISES AND ERROR HANDLING...............');
+    console.log('ERROR HANDLING...............');
 
-    console.log('try, catch, finally...............');
+    console.log('TRY, CATCH, FINALLY...............');
     try {
         let car8 = new Car;
     } catch (error) {
@@ -514,7 +523,8 @@ function languageFeatures() {
         console.log('this always executes');
     }
     
-    console.log('Developer defined error...............');
+    console.log('\n');
+    console.log('DEVELOPER DEFINED ERROR...............');
     try {
         throw new Error('this is a custom error');
     } catch (error) {
@@ -523,87 +533,96 @@ function languageFeatures() {
     finally {
         console.log('this always executes');
     }
-
-    //Promises   
-    console.log('\n');
-    console.log('PROMISES...............');
-
-    console.log('Creating a promise...............');
-    let promise = new Promise (
-        function (resolve, reject) {
-            setTimeout(reject, 100, 'someValue');
-        }
-    )
-
-    console.log(promise);
-
-    console.log('Settling a promise...............');
-    promise.then(
-        value => console.log('fulfilled: ' + value),
-        error => console.log('rejected: ' + error)
-    )
-
-
+    
     console.log('\n');
     console.log('DATA ACCESS...............');
 
     console.log('using XHR(XML HTTP REQUEST)...............');
-    let xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            console.log(this.responseText);
-        }
-    }
+    console.log('Uncomment code below to test XHR usage');
 
-    xhttp.open('GET', 'https://60112f8991905e0017be45dd.mockapi.io/api/v1/users', true);
-    xhttp.send();
+    // //XMLHttpRequest object helps us work with servers
+    // //creating a new XHR request
+    // let xhttp = new XMLHttpRequest();
 
+    // //initializing newly created request to use GET http method to
+    // //get data from specified url
+    // xhttp.open('GET', 'https://60112f8991905e0017be45dd.mockapi.io/api/v1/users', true);
+
+    // //sending the request to the server
+    // xhttp.send();
+
+    // //return the response text from the server for request
+    // //that was sent when the state of the request changes
+    // //
+    // xhttp.onreadystatechange = function () {
+    //     //if our client request is done being handled by the server
+    //     //readyState === 4,
+    //     //and our status code from the server is 200 (Ok)
+    //     //we log the responseText that was sent back by the server
+    //     //to the console
+    //     if (this.readyState === 4 && this.status === 200) {
+    //         console.log(this.responseText);
+    //     }
+    // }
+   
+    console.log('\n');
     console.log('using jQuery GET...............');
-    console.log('import jquery into our js file......')
-    let s = document.createElement("script");
-    s.src = "/jquery.js";
-    s.onload = function (e) {
-        //use the normal jQuery approach
-        $.get('https://60112f8991905e0017be45dd.mockapi.io/api/v1/users', 
-            data => console.log('data: ', data)
-        );
+    console.log('Uncomment code below to test jQuery GET');
+    // console.log('import jquery into our js file......')
+    // let s = document.createElement("script");
+    // s.src = "./jquery.js";
+    //s.onload = function (e) {
+        // //use the normal jQuery approach with callback function
+        // $.get('https://60112f8991905e0017be45dd.mockapi.io/api/v1/users', 
+        //     data => console.log('data: ', data)
+        // );
 
         //use promises to get the data
-        let promise = $.get('https://60112f8991905e0017be45dd.mockapi.io/api/v1/users');
+        // let promise = $.get('https://60112f8991905e0017be45dd.mockapi.io/api/v1/users');
 
-        promise.then(
-            my_data => console.log("My data: ", my_data),
-            error => console.log('Error', error)
-        )
+        // promise.then(
+        //     my_data => console.log("My data: ", my_data),
+        //     error => console.log('Error', error)
+        // )
 
         //using jQuery POST
+        console.log('\n');
         console.log('using jQuery POST...............');
-        let user = {
-            name: "Albert Nuwagaba",
-            avatar: "albert.jpg"
-        };
+        console.log('Uncomment code below to test jQuery POST');
+        // let user = {
+        //     name: "Albert Nuwagaba",
+        //     avatar: "albert.jpg"
+        // };
 
-        let promise1 = $.post('https://60112f8991905e0017be45dd.mockapi.io/api/v1/users', user);
-        promise1.then(
-            post_data => console.log('post_data: ', post_data),
-            error => console.log('Error: ', error)
-        )
-    };
-    document.head.appendChild(s);
+        // let promise1 = $.post('https://60112f8991905e0017be45dd.mockapi.io/api/v1/users', user);
+        // promise1.then(
+        //     post_data => console.log('post_data: ', post_data),
+        //     error => console.log('Error: ', error)
+        // )
+    //};
+    //document.head.appendChild(s);
 
     //Forms
+    console.log('\n');
     console.log('Prevent Default Form Submission...............');
     let form = document.getElementById('user-form');
     form.addEventListener('submit', event => {
         event.preventDefault();
+        //using the HTML DOM Web API, we
         //get the data from the user fields
         let user = form.elements['user'];
         let avatarFile = form.elements['avatar-file'];
+        console.log(user);
 
         //validating data
         let userError = document.getElementById('user-error');
+        
+        console.log(user.value.length); //11
 
-        if (user.value.length < 5) {
+        //using the HTML DOM Web API, if our input field
+        //has content that is less than 5, we
+        //raise an error for this entry
+        if (user.value.length < 1) {
             userError.textContent = 'Invalid Entry';
             userError.style.color = 'red';
             user.style.borderColor = 'red';
@@ -612,14 +631,15 @@ function languageFeatures() {
         
         //posting data from javascript
         let n_s = document.createElement('script');
-        n_s.src = '/jquery.js';
+        n_s.src = './jquery.js';
         n_s.onload = function (e) {
             let posting = {
                 user: user.value,
                 avatarFile: avatarFile.value
             }
 
-            let promise = $.post('https://60112f8991905e0017be45dd.mockapi.io/api/v1/users', posting);
+            //return user data from mockapi.io
+            let promise = $.post("https://60112f8991905e0017be45dd.mockapi.io/api/v1/users", posting);
 
             promise.then(
                 data => console.log('success: ', data),
