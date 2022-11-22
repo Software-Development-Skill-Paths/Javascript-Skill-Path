@@ -231,7 +231,7 @@ function startBlackJack () {
         }
 
         if (playerScore === dealerScore) {
-            textArea.innerText += "DRAW GAME!";
+            textArea.innerText += " DRAW GAME!";
             gameOver = false;
             resetButtons();
         }
