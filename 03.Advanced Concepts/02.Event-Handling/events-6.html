@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Events 6</title>
+            <script src="https://code.jquery.com/jquery-1.7.0.min.js" integrity="sha256-/05Jde9AMAT4/o5ZAI23rUf1SxDYTHLrkOco0eyRV84=" crossorigin="anonymous"></script>
+            <link rel="stylesheet" href="event-styles.css" type="text/css">
+        </head>
+        <body>
+            <div id="WorkArea" class="clickable">
+                <h5 class="clickable">Work Area</h5>
+                <hr>
+                <input type="button" class="clickable" value="Click Me">
+                <p class="clickable">click me, too!</p>
+                <p class="clickable">This is some more text with an embedded
+                    <span class="clickable">clickable</span> element
+                </p>
+            </div>
+            <div id="Messages">
+                <h5>Messages</h5>
+                <hr>
+            </div>
+        </body>
+        <script>
+            //$() is a shorthand for $(document).ready()
+            //passing an object as a parameter
+            $(function() {
+                var showEventMessage = function(options) {
+                    options = $.extend(
+                        {   eventType: 'CLICK',
+                            eventTarget: this,
+                            suffix: '<br/>'
+                        }, options);
+                    var message = options.eventType + ': ' + (options.eventTarget.nodeName || 'unknown') +
+                                  options.suffix;
+                    $('#Messages').append(message);
+                };
+
+                namedHandler = function(event) {
+                    if (!event.isPropagationStopped() && 
+                        !event.isImmediatePropagationStopped() &&
+                        !event.isDefaultPrevented()) {
+                        showEventMessage.call(this, { eventType: 'namedHandler ' + event.type });
+                        event.stopPropagation();        
+                    }
+                }
+
+                $('.clickable')
+                    //event - this is a standard javascript event
+                    //remove every click event attached to our clickable class
+                    //elements even after page reloads
+                    .off('click')
+
+                    //adding a named Handler for the click and dbclick events
+                    .on('click dblclick',namedHandler)
+
+                    //use the .on() to attach event hadlers to events on elemnts with
+                    //the clickable class
+                    .on('click dblclick mousedown', function(event) {
+                        //if it's true that the propagation methods have not been
+                        //called, go ahead and use them
+                        if (!event.isPropagationStopped() && 
+                            !event.isImmediatePropagationStopped() &&
+                            !event.isDefaultPrevented()) {
+                            showEventMessage.call(this, { eventType: event.type });
+                            event.stopPropagation();
+                        }
+
+                        if (event.type === 'mousedown') {
+                            event.preventDefault();
+                        }
+                    })
+                    .on('mousedown click', function(event) {
+                        //if it's true that the propagation methods have not been
+                        //called, go ahead and use them
+                        if (!event.isPropagationStopped() && 
+                            !event.isImmediatePropagationStopped() &&
+                            !event.isDefaultPrevented()) {
+                            showEventMessage.call(this, {eventType: event.type, suffix: '#2<br/>'});
+                        }
+                    })
+
+                    //this is specifically added to handle select issues with
+                    //internet Explorer
+                    //the selectstart event is one that is fired when a user
+                    //begins to select text in internet explorer
+                    .on('selectstart', function(event) {
+                        event.preventDefault();
+                    })
+
+                    //removing the namedHandler function just for the click event
+                    .off('click', namedHandler);
+            }); 
+        </script>
+    </html>
