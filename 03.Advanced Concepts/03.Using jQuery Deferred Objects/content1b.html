@@ -1,0 +1,25 @@
+<div id="content-1">
+    <!--this is our static content-->
+    This is content #1
+</div>
+
+<script>
+    //this is our dynamic content
+    $(function() {
+        //the setTimeout method will be used to simulate some
+        //long running process from the server
+        setTimeout(function() {
+            $('#content-1')
+                .append('<hr />')
+                .append('more content loaded dynamically')
+                //after loading dynamic content, trigger the
+                //COMPLETE EVENT
+                //Note: this COMPLETE EVENT will BUBBLE UP to 
+                //the SECTION DIV (div with id='section-1') 
+                //that is within our main page(deferred-10.html)
+                //in which content from this page (content1a.html)
+                //is being loaded into
+                .trigger('complete'); 
+        }, 5000);
+    });
+</script>

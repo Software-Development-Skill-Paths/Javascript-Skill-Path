@@ -1,0 +1,17 @@
+<div id="content-1">
+    <!--this is our static content-->
+    This is content #1
+</div>
+
+<script>
+    //this is our dynamic content
+    $(function() {
+        //the setTimeout method will be used to simulate some
+        //long running process from the server
+        setTimeout(function() {
+            $('#content-1')
+                .append('<hr />')
+                .append('more content loaded dynamically')
+        }, 2000)
+    });
+</script>

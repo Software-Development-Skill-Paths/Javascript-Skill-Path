@@ -1,0 +1,25 @@
+<div id="content-3">
+    <!--this is our static content-->
+    This is content #3
+</div>
+
+<script>
+    //this is our dynamic content
+    $(function() {
+        //the setTimeout method will be used to simulate some
+        //long running process from the server
+        setTimeout(function name(params) {
+            $('#content-3')
+                .append('<hr />')
+                .append('Some really important information that you need to read')
+                //after loading dynamic content, trigger the
+                //FAILURE EVENT
+                //Note: this FAILURE EVENT will BUBBLE UP to 
+                //the SECTION DIV (div with id='section-3') 
+                //that is within our main page(deferred-10.html)
+                //in which content from this page (content3b.html)
+                //is being loaded into
+                .trigger('failure', {statusText: 'Content3b triggered an error'}); 
+        }, 5000)
+    });
+</script>

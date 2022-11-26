@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deferred Processing</title>
+    <script src="http://code.jquery.com/jquery-1.7.min.js"></script>
+    <link rel="stylesheet" href="deferred-styles.css" type="text/css">
+</head>
+<body>
+    <input id="load" type="button" value="Load" />
+    <div id="section-1"></div>
+    <div id="section-2"></div>
+    <div id="section-3"></div>
+    <input id="proceed" type="button" value="Proceed" disabled="true" />
+    <div id="messages"></div>
+</body>
+<script>
+    $(function() {
+        /**
+         * Project Concept: Loading Dynamic Content
+         * 
+         * 1. Load content into three <DIV> elements - asynchronously
+         * 2. When all content is loaded, enable another element
+         * 3. Only load content when the user clicks the "Load Button"
+         */
+
+        $('#load')
+            .click(function() {
+               //the load jquery method provides a callback function
+               //of what to do after content has been loaded
+               $('#section-1').load('content-1.html', function() {
+                    $('#proceed').removeAttr('disabled');
+               }); 
+            });
+    });
+</script>
+</html>

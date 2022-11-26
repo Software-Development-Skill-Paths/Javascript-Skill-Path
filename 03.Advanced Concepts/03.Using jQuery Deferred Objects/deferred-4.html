@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deferred Processing</title>
+    <script src="http://code.jquery.com/jquery-1.7.min.js"></script>
+    <link rel="stylesheet" href="deferred-styles.css" type="text/css">
+</head>
+<body>
+    <input id="load" type="button" value="Load" />
+    <div id="section-1"></div>
+    <div id="section-2"></div>
+    <div id="section-3"></div>
+    <input id="proceed" type="button" value="Proceed" disabled="true" />
+    <div id="messages"></div>
+</body>
+<script>
+    $(function() {
+        /**
+         * Project Concept: Loading Dynamic Content
+         * 
+         * 1. Load content into three <DIV> elements - asynchronously
+         * 2. When all content is loaded, enable another element
+         * 3. Only load content when the user clicks the "Load Button"
+         */
+        
+        //when the load button is clicked, then activate the PROCEED 
+        //BUTTON
+        //when and then are jQUery methods we can use to organize our
+        //logic pattern
+        //the when method returns a jQuery Deferred Object that can be
+        //used later on or it can be deferred for processing. The 
+        //deferred object promises to notify our code upon completion
+        //of a process. This notification from the deferred object is
+        //made use of in the .then method
+        //the load method doesn't return a deferred object whereas the
+        //get() method does
+
+        $('#load')
+            .click(function() {
+                //WHEN the CONTENT IS LOADED, THEN enable the PROCEED
+                //button
+                $.when(
+                    $.get('content-1.html', function(result) {
+                        $('#section-1').html(result);
+                    }, 'html'),
+                    $.get('content-2.html', function(result) {
+                        $('#section-2').html(result);
+                    }, 'html'),
+                    $.get('content-3.html', function(result) {
+                        $('#section-3').html(result);
+                    }, 'html')
+                )
+                .then(function() {
+                    $('#proceed').removeAttr('disabled');
+                });
+            });
+    });
+</script>
+</html>

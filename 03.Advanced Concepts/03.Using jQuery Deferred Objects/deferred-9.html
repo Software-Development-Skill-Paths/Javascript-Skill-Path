@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deferred Processing</title>
+    <script src="http://code.jquery.com/jquery-1.7.min.js"></script>
+    <link rel="stylesheet" href="deferred-styles.css" type="text/css">
+</head>
+<body>
+    <input id="load" type="button" value="Load" />
+    <div id="section-1"></div>
+    <div id="section-2"></div>
+    <div id="section-3"></div>
+    <input id="proceed" type="button" value="Proceed" disabled="true" />
+    <div id="messages"></div>
+</body>
+<script>
+    $(function() {
+        /**
+         * Project Concept: Loading Dynamic Content
+         * 
+         * 1. Load content into three <DIV> elements - asynchronously
+         * 2. When all content is loaded, enable another element
+         * 3. Only load content when the user clicks the "Load Button"
+         */
+        
+         /**
+          * This demonstrates how to create our own Deferred Object
+          * 
+          * Note: the .when() returns a deferred object that is 
+          * different from the one we create ourselves in the
+          * loadSection function. This object returned by the .when()
+          * is managed by JQuery because we call the .when() method 
+          * directly on JQuery library ($.when()). As soon as any of 
+          * the code in the loadSection calls return a deferred that 
+          * is rejected, the enclosed deferred object used by the
+          * .when() method is also rejected. Once a deferred is
+          * rejected or resolved, it cannot change state again. In
+          * short, the jQuery deferred object can only have one
+          * failure; as soon as this failure happens, all other 
+          * subsequent failures are ignored. We can find out each 
+          * failure point but will need to manage this in our custom 
+          * deferred object and not in the deferred object used 
+          * within the .when() block
+          * 
+         */
+
+        //creating a single function to remove the need of using many
+        //get() methods to handle the loading of different content pages
+        var loadSection = function(options) {
+            //create our own deferred Object using the jQuery Deferred()
+            //method
+            var defer = $.Deferred()
+
+            //this variable will hold the div into which our content will
+            //be loaded into 
+            var $div;
+
+            if (typeof options !== 'object') {
+                return defer.reject({ statusText: 'Expecting parameter object' });
+            }
+
+            options.selector = options.selector || '';
+            options.url = options.url || '';
+
+            if (options.url === '') {
+                return defer.reject({ statusText: 'Missing URL '});
+            }
+
+            $div = $(options.selector)
+
+            if ($div.length > 0) {
+                $div.load(options.url, function() {
+                    defer.resolve();
+                });
+            }
+            else {
+                defer.reject({ statusText: 'Error in selector' });
+            }
+
+            return defer;
+        }
+        $('#load')
+            .click(function() {
+                var myDefer = $.when(
+                    loadSection({ selector: '#section-1', url: 'content1a.html' }),
+                    loadSection({ selector: '#section-2', url: 'content-2.html'}),
+                    loadSection({ selector: '#section-3', url: 'content-3.html'}),
+                    //loadSection(),
+                    loadSection({})
+                )
+                //Make it a habbit to use the promise() method so that
+                //you protect the state of the deferred object from being 
+                //changed. However, you can remove this method of you have a use
+                //case that requires you to change the deferred object's state
+                .promise()
+                .done(function() {
+                })
+                .fail(function(result) {
+                    $('#messages').append('Failure!<br />')
+                        .append('Result: ' + result.statusText + '<br />');
+                })
+                .always(function() {
+                    $('#proceed').removeAttr('disabled');
+                })
+            });
+    });
+</script>
+</html>

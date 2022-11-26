@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deferred Processing</title>
+    <script src="http://code.jquery.com/jquery-1.7.min.js"></script>
+    <link rel="stylesheet" href="deferred-styles.css" type="text/css">
+</head>
+<body>
+    <input id="load" type="button" value="Load" />
+    <div id="section-1"></div>
+    <div id="section-2"></div>
+    <div id="section-3"></div>
+    <input id="proceed" type="button" value="Proceed" disabled="true" />
+    <div id="messages"></div>
+</body>
+<script>
+    $(function() {
+        /**
+         * Project Concept: Loading Dynamic Content
+         * 
+         * 1. Load content into three <DIV> elements - asynchronously
+         * 2. When all content is loaded, enable another element
+         * 3. Only load content when the user clicks the "Load Button"
+         */
+        
+         /**
+          * Final Version of how to create our own Deferred Object
+          * 
+          * Note: When we reject our custom Deferred object in the 
+          * loadSection(), this IMMEDIATELY rejects the Deferred 
+          * object that is used by the .when() where our loadSection()
+          * was called. This causes the .fail() and .always() processes
+          * associated with the .when() to IMMEDIATELY be processed
+          * processed because once the state of a Deferred Object is 
+          * established, it cannot be changed. When the Deferred Object
+          * in our loadSection() is rejected, nothing will happen again
+          * to any other Deferred Objects within our code
+          * 
+         */
+
+         var showMessage = function(options) {
+            if (typeof options !== 'object') {
+                options = { message: 'Parameter not an object', error: true };
+            }
+            options.message = options.message || 'No message specified';
+            options.error = options.error || false;
+            $('#messages')
+                .append(options.error ? 'Error: ' : '')
+                .append(options.message)
+                .append('<br />');
+         }, 
+
+        //creating a single function to remove the need of using many
+        //get() methods to handle the loading of different content page
+        //sections
+         loadSection = function(options) {
+            //create our own deferred Object using the jQuery Deferred()
+            //method
+            var defer = $.Deferred(), 
+                $div, msg;
+
+            if (typeof options !== 'object') {
+                msg = 'Expecting parameter object';
+                showMessage({ message: msg, error: true });
+                //return defer.reject({ statusText: msg });
+                return defer.resolve({ statusText: msg });
+            }
+
+            options.selector = options.selector || '';
+            options.url = options.url || '';
+            options.dynamic = options.dynamic || false;
+
+            if (options.url === '') {
+                msg = 'Missing URL';
+                //return defer.reject({ statusText: msg });
+                return defer.resolve({ statusText: msg });
+            }
+
+            $div = $(options.selector)
+
+            //working with the section in which our content will be loaded
+            if ($div.length > 0) {
+                //the get method returns a deferred object whereas the load
+                //method does not
+                $.get(options.url, function(){}, 'html')
+                    //result is the output from running the get() method
+                    .done(function(result) {
+                        $div.html(result);
+                        //once .get has finished running, if dynamic content
+                        //is not expected, we can reslove our object because
+                        //there are no long runnig processes on our page
+                        if (!options.dynamic) {
+                            defer.resolve();
+                        }
+                    })
+                    //if we encounter a failure in running the .get(), we
+                    //report that failure and pass along what the .get()
+                    //returned when it failed
+                    .fail(function(result) {
+                        msg = 'Could not load URL: ' + options.url;
+                        showMessage({ message: msg, error: true });
+                        //defer.reject(result);
+                        defer.resolve(result)
+                    });
+
+                if (options.dynamic) {
+                    //if dynamic content exists turn off the complete and 
+                    //failure event handlers if they already exist so that
+                    //we can add our own handlers
+                    //complete and failure are custom events
+                    //we call the on and off methods on our div
+                    $div.off('complete, failure')
+                        //complete event is fired when the loading of our
+                        //dynamic content is completed so any dynamic page
+                        //will need to trigger this event when dynamic
+                        //content is done loading
+                        .on('complete', function(event) {
+                            defer.resolve();
+                        })
+                        //failure event means something went wrong in the
+                        //dynamic content and we want to report it
+                        //events can contain additonal informatio which we
+                        //can find in the result parameter
+                        //event parameter contains any information that is 
+                        //similar to any other event within the system such 
+                        //as click, blur, etc
+                        .on('failure', function(event, result) {
+                            msg = 'Dynamic content: ' + result.statusText;
+                            showMessage({ message: msg, error: true });
+                            //defer.reject(result);
+                            defer.resolve(result)
+                        });
+                }
+            }
+            else {
+                //if no section was provided,
+                //run the following code
+                msg = 'Error in selector';
+                showMessage({ message: msg, error: true} );
+                //defer.reject({ statusText: msg });
+                defer.resolve({ statusText: msg });
+            }
+
+            //we return a promise instead of the entire deffered object
+            //this will ensure that our calling code will not interfer
+            //with how our deferred object is resolved
+            return defer.promise();
+        }
+        $('#load')
+            .click(function() {
+                /* The Logic behind our code is as follows:
+                * WHEN PROCESSING THESE EMBEDDED FUNCTIONS, RUN THE DONE  
+                * FUNCTION IMMEDIATELY AFTER SUCCESS OR RUN THE FAIL FUNCTION
+                * IMMEDIATELY AFTER FAILURE. THEN RUN THE ALWAYS FUNCTION
+                * RIGHT AWAY AS WELL
+                * 
+                * However, we want our logic to be:
+                * WHEN PROCESSING THE EMBEDDED FUNCTIONS, REPORT ERRORS TO 
+                * THE MESSAGE AREA AND KEEP PROCESSING. WHEN EVERYTHING IS 
+                * PROCESSED, ENABLE THE PROCEED BUTTON
+                * 
+                * The reason we want our logic to run like this is because
+                * we are directly handling the errors in the loadSection()
+                * function so there is really no need to reject our Custom 
+                * Deferred Object within the loadSection() function. We 
+                * can instead resolve our Deferred Object so that processing
+                * within the loadSection() continues and our Deferred does
+                * not get rejected. We accomplish this by changing all our
+                * reject() methods within the loadSection() function to 
+                * resolve() methods
+                * */
+
+
+                $.when(
+                    //how come the showMessage() will work when it doesn't return
+                    //any value or any deferred object? This is because of the power
+                    //of the jQuery Deferred Object. The .when() produces a Deferred
+                    //object that processes a group of deferred objects that arise when
+                    //the loadSection() are run. If any of the loadSection() processing
+                    //functions don't return a deferred object, just like the showMessage
+                    // doesn't return one, .when() will treat those functions as resolved
+                    //deferred Objects by default. This means we can inter-mingle 
+                    //synchronous and asynchronous processes. Any synchronous processes 
+                    //will be resolved immediately and processing will continue when the
+                    //asynchronous process is done.
+                    showMessage({ message: 'Starting processing' }),
+
+                    //if we don't include the dynamic property on a page that contains
+                    //dynamic content, the PROCEED button will be activated before our
+                    //dynamic content finishes being processed which is the thing we are
+                    //trying to avoid
+                    //if we include the dynamic property on a page that doesn't contain
+                    //dynamic content; a page that doesn't trigger the COMPLETE or 
+                    //FAILURE event, the Deffered Object used by the .when() would never
+                    //resolve, we would need to have a master monitoring process that 
+                    //identifies this contigency and deals with it
+                    loadSection({ selector: '#section-1', url: 'content1b.html', dynamic: true }),
+                    loadSection({ selector: '#section-2', url: 'content-2.html'}),
+                    loadSection({ selector: '#section-3', url: 'content3b.html', dynamic: true}),
+                    loadSection(),
+                    loadSection({}),
+                    loadSection({ selector: '#section-4', url: 'content1.html'}),
+                    showMessage({ message: 'Done with processsing'})
+                )
+                .done(function() {
+                })
+                .fail(function(result) {
+                    $('#messages').append('Failure!<br />')
+                        .append('Result: ' + result.statusText + '<br />');
+                })
+                .always(function() {
+                    $('#proceed').removeAttr('disabled');
+                })
+            });
+    });
+</script>
+</html>
